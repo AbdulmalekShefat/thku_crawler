@@ -7,13 +7,14 @@ import datetime
 
 # ------------------------------------------------------------------------------------------------#
 
-cred = credentials.Certificate('UTAA STU-d3238d5cd8fa.json')
+cred = credentials.Certificate('/home/msl/PycharmProjects/thku_crawler/UTAA STU-d3238d5cd8fa.json')
 default_app = firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://utaa-stu.firebaseio.com/'
 })
 
 # As an admin, the app has access to read and write all data, regradless of Security Rules
 ref = db.reference('notifications')
+
 # ------------------------------------------------------------------------------------------------#
 
 last_ref = ref.child('last')
@@ -25,6 +26,7 @@ url = 'http://thk.edu.tr/'
 dates = []
 titles = []
 contents = []
+links = []
 
 data = []
 
@@ -33,6 +35,7 @@ data = []
 
 
 def beautify(link):
+    dryscrape.start_xvfb()
     session = dryscrape.Session()
     session.visit(link)
     response = session.body()
@@ -49,6 +52,7 @@ def main_crawler():
         if title == last:
             break
         titles.append(title)
+        links.append(href)
         inner_crawler(href)
     for link in needed.findAll('div', {'class': 'widgetDate'}):
         date = str(link.string).replace(".", "/")
@@ -70,6 +74,7 @@ def array_to_dict():
             'title': titles[i],
             'date': datetime.datetime.strptime(dates[i], '%d/%m/%Y').strftime('%Y/%m/%d'),
             'body': contents[i],
+            'link': links[i],
             'topic': 'General'
         }
         data.append(datum)
@@ -88,6 +93,8 @@ def update_notifications():
     ref.update(last_not)
     for datum in data:
         ref.child('items').push(datum)
+    print(titles)
 
 
 update_notifications()
+print("updated")
