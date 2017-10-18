@@ -75,7 +75,7 @@ def array_to_dict():
             'date': datetime.datetime.strptime(dates[i], '%d/%m/%Y').strftime('%Y/%m/%d'),
             'body': contents[i],
             'link': links[i],
-            'topic': 'General'
+            'topic': 'thk.edu.tr'
         }
         data.append(datum)
 
